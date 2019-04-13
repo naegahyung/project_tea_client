@@ -17,6 +17,10 @@ class DataRecording extends Component {
   componentDidMount() {
     this.mockData();
     this.manager = this.props.navigation.getParam('manager', null);
+    if (!this.manager) {
+      this.setState({ records: [] });
+      return;
+    }
   }
 
   deleteAll = () => {
