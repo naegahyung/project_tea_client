@@ -19,6 +19,7 @@ class HomeScreen extends Component {
     scanning: false,
     message: '',
     isConnected: false,
+    device: null,
   }
 
   bluetoothManager = new BleManager();
@@ -70,6 +71,7 @@ class HomeScreen extends Component {
     let timeout; 
     this.setState({ scanning: true });
     this.bluetoothManager.startDeviceScan(null, null, async (error, device) => {
+      if (!device) return;
       timeout = setTimeout(() => {
         this.stopScanning();
       }, 30000)
@@ -81,7 +83,11 @@ class HomeScreen extends Component {
         clearTimeout(timeout);
         this.stopScanning();
         try {
-          await this.bluetoothManager.connectToDevice('00:DB:DF:7C:FD:43')
+          let device = await this.bluetoothManager.connectToDevice('00:DB:DF:7C:FD:43');
+          device = await device.discoverAllServicesAndCharacteristics()
+          console.log(device);
+          this.setState({ device });
+          return;
         } catch (e) {
           this.setState({ message: 'failed to connect after discovery ' + e })
           this.connectToBluetooth();
@@ -98,7 +104,7 @@ class HomeScreen extends Component {
 
   navigateToDataCollection = () => {
     this.props.navigation.navigate('RecordsPage', {
-      manager: this.bluetoothManager,
+      device: this.state.device,
     })
   }
 

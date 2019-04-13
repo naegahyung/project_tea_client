@@ -12,15 +12,32 @@ class DataRecording extends Component {
     records: [],
   }
 
-  manager = null;
+  device = null;
+
+  readInterval = null;
 
   componentDidMount() {
     this.mockData();
-    this.manager = this.props.navigation.getParam('manager', null);
-    if (!this.manager) {
+    this.device = this.props.navigation.getParam('device', null);
+    if (!this.device) {
       this.setState({ records: [] });
       return;
     }
+    this.readInterval = setInterval(() => {
+      this.getInfo();
+    }, 2000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.readInterval);
+  }
+
+  getInfo = async () => {
+    let characteristic = await device.readCharacteristicForDevice('00:DB:DF:7C:FD:43', null, null)
+    console.log(characteristic);
+    this.setState(prevState => ({ 
+      records: prevState.records.concat([ JSON.stringify(characteristic )]) 
+    }));
   }
 
   deleteAll = () => {
