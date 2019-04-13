@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
-import { View, Text } from 'react-native';
-import LineGraph from './LineGraph';
+import { View, Text, Button, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { BleManager } from 'react-native-ble-plx';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
+import LineGraph from './LineGraph';
 
 const speedData = [0,3,8,14,20,28,30,32,29,27,27,27,29,33,35] //15
 const airFlowRateData = [10.3, 11.31, 11.78, 19.83, 30.25, 35.69, 39.19, 41.11, 40.82, 38.32, 38.11, 38.19, 40.18, 44.36, 45.11 ];
@@ -10,12 +12,21 @@ const data = [];
 
 class HomeScreen extends Component {
   static navigationOptions = {
-    header: null
+    header: null,
   }
+
+  state = {
+    scanning: false,
+    message: '',
+    isConnected: false,
+  }
+
+  bluetoothManager = new BleManager();
 
   render() {
     return (
       <View style={{ flex: 1 }}>
+        {this.renderBluetoothConnection()}
         {this.renderTopBar()}
         {this.renderTopGraphs()}
         {this.renderBottomGraphs()}
@@ -32,22 +43,83 @@ class HomeScreen extends Component {
     )
   }
 
+  renderBluetoothConnection() {
+    const { message, scanning, isConnected } = this.state;
+    let header = <View /> 
+    if (isConnected) { 
+      header = <Text>Connected 00:DB:DF:7C:FD:43</Text>
+    } else if (!isConnected && scanning) {
+      header = <ActivityIndicator size="large" color="#0000ff" />
+    } else {
+      header = (
+        <Button
+          title="Connect"
+          onPress={this.connectToBluetooth}
+        />
+      )
+    }
+    return (
+      <View>
+        {message.length > 0 ? <Text>{message}</Text> : null}
+        {header}
+      </View>
+    )
+  }
+
+  connectToBluetooth = () => {
+    let timeout; 
+    this.setState({ scanning: true });
+    this.bluetoothManager.startDeviceScan(null, null, async (error, device) => {
+      timeout = setTimeout(() => {
+        this.stopScanning();
+      }, 30000)
+      if (error) {
+        return
+      }
+
+      if (device.id == '00:DB:DF:7C:FD:43') {
+        clearTimeout(timeout);
+        this.stopScanning();
+        try {
+          await this.bluetoothManager.connectToDevice('00:DB:DF:7C:FD:43')
+        } catch (e) {
+          this.setState({ message: 'failed to connect after discovery ' + e })
+          this.connectToBluetooth();
+          console.log("error ", e);
+        }
+      }
+    });
+  }
+
+  stopScanning = () => {
+    this.setState({ scanning: false, message: '' });
+    this.bluetoothManager.stopDeviceScan();
+  }
+
+  navigateToDataCollection = () => {
+    this.props.navigation.navigate('RecordsPage', {
+      manager: this.bluetoothManager,
+    })
+  }
+
   renderSettingIcon() {
     const Material = MaterialCommunityIcons
     return (
-      <View style={{
-        marginHorizontal: 20,
-        top: 2,
-        alignSelf: 'flex-end',
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: 'black',
-      }}>
-        <Material name="car-side" size={30} style={{ left: 5 }} />
-        <Material name="information-variant" size={20} style={{ right: 2 }} />
-      </View>
+      <TouchableOpacity onPress={this.navigateToDataCollection}>
+        <View style={{
+          marginHorizontal: 20,
+          top: 2,
+          alignSelf: 'flex-end',
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderRadius: 5,
+          borderWidth: 1,
+          borderColor: 'black',
+        }}>
+          <Material name="car-side" size={30} style={{ left: 5 }} />
+          <Material name="information-variant" size={20} style={{ right: 2 }} />
+        </View>
+      </TouchableOpacity>
     );
   }
 

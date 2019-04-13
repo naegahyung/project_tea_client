@@ -135,6 +135,8 @@ android {
 }
 
 dependencies {
+    implementation project(':@react-native-community_async-storage')
+    implementation project(':react-native-ble-plx')
     implementation project(':react-native-maps')
     implementation project(':react-native-svg')
     implementation project(':react-native-gesture-handler')
