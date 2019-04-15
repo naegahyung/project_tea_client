@@ -36,6 +36,7 @@ export class TravelMap extends Component {
       <View style={{ borderBottomColor: 'grey', borderBottomWidth: 1, paddingVertical: 5 }}>
         <View style={{ margin: 20, height: 250, }}>
           <MapView
+            liteMode
             ref={ref => this.mapViewRef = ref}
             style={{ flex: 1 }}
             onLayout={this.initializeMap}

@@ -5,13 +5,8 @@ import { majorColor, lightColor } from '../../app.json';
 import * as shape from 'd3-shape'
 
 class LineGraph extends Component {
-  shouldComponentUpdate() {
-    return true;
-  } 
-  
   render() {
-    const { data, title, onGraphClick, isDetailGraph } = this.props;
-
+    const { title, onGraphClick, isDetailGraph, unit, data } = this.props;
     if (!data || !data.length) {
       return (
         <View style={styles.chartContainer}>
@@ -24,14 +19,16 @@ class LineGraph extends Component {
       <TouchableOpacity style={{ flex: 1 }} onPress={onGraphClick} disabled={isDetailGraph}>
         <View style={styles.chartContainer}>
           {this.renderGraph(data)}
-          {!isDetailGraph && this.renderTitle(title)}
+          {!isDetailGraph && this.renderTitle(title, unit)}
         </View>
       </TouchableOpacity>
     )
   }
 
-  renderTitle = (title) => (
-    <Text style={{ textAlign: 'center', color: 'black' }}>{title}</Text>
+  renderTitle = (title, unit) => (
+    <Text style={{ textAlign: 'center', color: 'black', fontSize: 10 }}>
+      {unit ? `${title} in ${unit}`.toUpperCase() : title.toUpperCase()}
+    </Text>
   )
 
   renderGraph = (data) => (
@@ -44,7 +41,7 @@ class LineGraph extends Component {
             fontSize: 10,
         }}
         numberOfTicks={ 5 }
-        formatLabel={ value => `${value} ${this.props.unit}` }
+        formatLabel={value => value}
       />
       <LineChart
           style={styles.chart}

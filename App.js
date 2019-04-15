@@ -15,7 +15,6 @@ import VoiceCommandScreen from './src/VoiceCommand';
 
 import GraphDetails from './src/Home/GraphDetail';
 import HealthHistory from './src/Health/HistoryList'; 
-import RecordingScreen from './src/Home/DataRecording';
 import { majorColor, lightColor } from './app.json';
 
 const HomeNavigator = createStackNavigator({
@@ -25,9 +24,6 @@ const HomeNavigator = createStackNavigator({
   DetailPage: { 
     screen: GraphDetails,
   },
-  RecordsPage: {
-    screen: RecordingScreen,
-  }
 })
 
 const HealthNavigator = createStackNavigator({

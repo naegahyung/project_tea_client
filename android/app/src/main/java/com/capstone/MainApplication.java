@@ -3,8 +3,8 @@ package com.capstone;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import io.github.douglasjunior.ReactNativeEasyBluetooth.classic.ClassicPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
-import com.polidea.reactnativeble.BlePackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.horcrux.svg.SvgPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -29,8 +29,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ClassicPackage(),
             new AsyncStoragePackage(),
-            new BlePackage(),
             new MapsPackage(),
             new SvgPackage(),
             new RNGestureHandlerPackage(),
